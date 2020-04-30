@@ -7,17 +7,23 @@
 library(rstan)
 library(LaplacesDemon)
 library(latex2exp)
+library(ggplot2)
 set.seed(1)
 
 ####------------------------ Simulate Data ---------------------------------####
-K = 10 # number of dose levels
+K = 10 # number of dose levels of Hydrochloroquine
 N = 100 # sample size
-warmup = 500
-iter = 1000
+warmup = 1000
+iter = 2000
 n_draws = iter - warmup
 
 
-#simulate standard normal confounder (L), dose (A), and outcome (Y)
+# simulate standard normal confounder (L), 
+# dose (A) of hydrochloroquine
+# and outcome (Y) blood oxygen levels
+# High L makes you less likely to get a high dose, and likely to have a worse outcome
+# Think of L as something like having high blood pressure
+
 L = rnorm(n = N) 
 
 A = numeric(length = N)
@@ -45,7 +51,7 @@ stan_data = list(Y=Y, L=X, A = A_mat[,-1],
                  N=N, num_A_levels = K-1, P = ncol(X) )
 
 ####------------------------ Sample Posterior    ---------------------------####
-DR_model = stan_model(file = "DR_model.stan")
+DR_model = stan_model(file = "dose_response/DR_model.stan")
 
 stan_res = sampling(DR_model, data = stan_data, 
                     warmup = warmup, iter = iter, chains=1, seed=1)
@@ -97,3 +103,16 @@ legend('bottomleft',
        col = c('steelblue', 'black', 'red'), pch=c(20,20,20), lty=c(1,1,1),
        bty='n')
 dev.off()
+
+
+### Thetas might be more clear ###
+theta_posterior = extract(stan_res, pars='theta')[[1]]
+theta_posterior_mean = apply(theta_posterior, 2, mean)
+
+true_theta = 5*pnorm(dose-5)
+freq_mle = freq_reg$coefficients[3:11]
+
+ggplot() +
+  geom_line(aes(x = dose, y = true_theta), color = 'red') + 
+  geom_line(aes(x = dose, y = freq_mle), color = 'black') + 
+  geom_line(aes(x = dose, y = theta_posterior_mean), color = 'blue')

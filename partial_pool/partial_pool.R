@@ -30,7 +30,7 @@ stan_data = list(Y=Y, A=A, V=Vmat, W = Wmat,
                  Pw = ncol(Wmat), Pv = ncol(Vmat), N=N)
 
 ####------------------------ Sample Posterior    ---------------------------####
-partial_pool_model = stan_model(file = "partial_pool.stan")
+partial_pool_model = stan_model(file = "partial_pool/partial_pool.stan")
 
 stan_res = sampling(partial_pool_model, data = stan_data, 
                     pars = c("odds_ratio", 'mu', "overall_odds_ratio" ),
