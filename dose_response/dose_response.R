@@ -11,18 +11,18 @@ library(ggplot2)
 set.seed(1)
 
 ####------------------------ Simulate Data ---------------------------------####
-K = 10 # number of dose levels of Hydrochloroquine
-N = 100 # sample size
+K = 10 # number of dose levels of intravenous bleach
+N = 100 # number of study participants
 warmup = 1000
 iter = 2000
 n_draws = iter - warmup
 
 
 # simulate standard normal confounder (L), 
-# dose (A) of hydrochloroquine
+# dose (A) of IV bleach
 # and outcome (Y) blood oxygen levels
-# High L makes you less likely to get a high dose, and likely to have a worse outcome
-# Think of L as something like having high blood pressure
+# L is here because we were nice and tried not to give people with
+# high blood pressue (L) too high of doses of IV bleach just in case
 
 L = rnorm(n = N) 
 
